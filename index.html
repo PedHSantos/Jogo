@@ -1,0 +1,124 @@
+<!--Programa: personagens do jogo
+Nome: Eduardo Castilho - Nº: 5 - Turma: 2B
+Nome: Leandro Rocha- Nº: 19
+Nome: Pedro Henrique Gomes dos Santos - Nº: 27
+DESCRIÇÃO: Fizemos dois personagens que se movimentão com comandos pela teclas do computados.
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Colisão</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+        .controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="controls">
+        <h3>Jogador Esquerdo (W-A-S-D)</h3>
+        <button onclick="move('left', 'player1')">Esquerda</button>
+        <button onclick="move('up', 'player1')">Cima</button>
+        <button onclick="move('down', 'player1')">Baixo</button>
+        <button onclick="move('right', 'player1')">Direita</button>
+        <button onclick="stop('player1')">Parar</button>
+        
+        <h3>Jogador Direito (Setas)</h3>
+        <button onclick="move('left', 'player2')">Esquerda</button>
+        <button onclick="move('up', 'player2')">Cima</button>
+        <button onclick="move('down', 'player2')">Baixo</button>
+        <button onclick="move('right', 'player2')">Direita</button>
+        <button onclick="stop('player2')">Parar</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const players = {
+            player1: { x: 50, y: 50, width: 30, height: 30, color: 'red' },
+            player2: { x: 700, y: 50, width: 30, height: 30, color: 'blue' }
+        };
+
+        // Função para desenhar os jogadores
+        function drawPlayers() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (const playerKey in players) {
+                const player = players[playerKey];
+                ctx.fillStyle = player.color;
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+            }
+        }
+
+        // Função para verificar colisão
+        function checkCollision() {
+            const { player1, player2 } = players;
+            if (
+                player1.x < player2.x + player2.width &&
+                player1.x + player1.width > player2.x &&
+                player1.y < player2.y + player2.height &&
+                player1.height + player1.y > player2.y
+            ) {
+                alert('COLISÃO DETECTADA');
+                stop('player1');
+                stop('player2');
+            }
+        }
+
+        // Função para mover jogadores
+        function move(direction, playerKey) {
+            const player = players[playerKey];
+            const moveAmount = 5;
+
+            switch (direction) {
+                case 'left': player.x -= moveAmount; break;
+                case 'right': player.x += moveAmount; break;
+                case 'up': player.y -= moveAmount; break;
+                case 'down': player.y += moveAmount; break;
+            }
+
+            checkCollision();
+            drawPlayers();
+        }
+
+        // parar o movimento
+        function stop(playerKey) {
+            // Neste caso, só desenhamos novamente os jogadores
+            drawPlayers();
+        }
+
+        // Função para lidar com os eventos de tecla
+        document.addEventListener('keydown', (event) => {
+            const keyMap = {
+                'w': () => move('up', 'player1'),
+                's': () => move('down', 'player1'),
+                'a': () => move('left', 'player1'),
+                'd': () => move('right', 'player1'),
+                'ArrowUp': () => move('up', 'player2'),
+                'ArrowDown': () => move('down', 'player2'),
+                'ArrowLeft': () => move('left', 'player2'),
+                'ArrowRight': () => move('right', 'player2')
+            };
+            if (keyMap[event.key]) keyMap[event.key]();
+        });
+
+        document.addEventListener('keyup', (event) => {
+            if (['w', 's', 'a', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+                const playerKey = event.key in {'w': 1, 's': 1, 'a': 1, 'd': 1} ? 'player1' : 'player2';
+                stop(playerKey);
+            }
+        });
+
+        // Iniciar o jogo desenhando os jogadores
+        drawPlayers();
+    </script>
+</body>
+</html>
